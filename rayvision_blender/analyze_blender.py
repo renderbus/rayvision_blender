@@ -81,12 +81,6 @@ class AnalyzeBlender(object):
             self.check_path(custom_exe_path)
         self.custom_exe_path = custom_exe_path
 
-        self.analyze_script_path = os.path.normpath(os.path.join(
-            os.path.dirname(__file__).replace("\\", "/"),
-            "tool", "check.py"))
-
-        self.check_path(self.analyze_script_path)
-
         self.platform = platform
 
         self.task_json = os.path.join(workspace, "task.json")
@@ -207,17 +201,18 @@ class AnalyzeBlender(object):
         if not os.path.exists(exe_path):
             self.logger.error("Please enter the blender software absolute path")
             raise AnalyseFailError
-
         self.write_task_json()
 
+        script_path = os.path.dirname(os.path.normpath(__file__)).replace("\\", "/")
+        self.analyze_script_path = os.path.join(script_path, "Analyze", "RBBlender.py")
+        self.check_path(self.analyze_script_path)
+
         if self.local_os == 'windows':
-            cmd = '"{exe_path}" -b "{cg_file}" -P "{run_py}" -- "{task_json}" "{tips_json}" "{asset_json}"'.format(
+            cmd = '"{exe_path}" -b "{cg_file}" -P "{run_py}" -- "{task_json}" "4"'.format(
                 exe_path=exe_path,
                 cg_file=self.cg_file,
                 run_py=self.analyze_script_path,
-                task_json=self.task_json,
-                tips_json=self.tips_json,
-                asset_json=self.asset_json,
+                task_json=self.task_json
             )
         else:
             self.logger.error("blender does not support linux rendering")
